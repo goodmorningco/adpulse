@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AdPulse — AI-Powered Google Ads Daily Reports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #FFFBF5;
+  --bg-warm: #FFF7ED;
+  --bg-card: #FFFFFF;
+  --surface: #F8F4EE;
+  --border: #E8E0D4;
+  --border-light: #F0EAE0;
+  --text: #1A1612;
+  --text-body: #4A4239;
+  --text-muted: #8A7E72;
+  --text-light: #B0A699;
+  --accent: #E85D26;
+  --accent-light: #FFECE4;
+  --accent-hover: #D14E1A;
+  --green: #2D8B5F;
+  --green-light: #E6F5ED;
+  --red: #C4402A;
+  --red-light: #FDEEEB;
+  --blue: #3B6FC0;
+  --amber: #C47F17;
+  --amber-light: #FFF8E7;
+  --radius: 14px;
+  --radius-sm: 10px;
+  --shadow-sm: 0 1px 3px rgba(26,22,18,0.04), 0 1px 2px rgba(26,22,18,0.06);
+  --shadow-md: 0 4px 16px rgba(26,22,18,0.06), 0 2px 6px rgba(26,22,18,0.04);
+  --shadow-lg: 0 12px 40px rgba(26,22,18,0.08), 0 4px 12px rgba(26,22,18,0.04);
+}
+
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 14px 0;
+  background: rgba(255, 251, 245, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-light);
+}
+
+nav .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.3px;
+}
+
+.logo span { color: var(--accent); }
+
+.nav-cta {
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 22px;
+  border-radius: 100px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.25s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-cta:hover { background: var(--accent); transform: translateY(-1px); }
+
+/* ── HERO ── */
+.hero {
+  padding: 130px 0 80px;
+  text-align: center;
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 16px 6px 8px;
+  background: var(--accent-light);
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  margin-bottom: 28px;
+}
+
+.hero-pill .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hero h1 {
+  font-size: clamp(34px, 7vw, 58px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  margin-bottom: 20px;
+  max-width: 680px;
+  margin-left: auto;
+  margin-right: auto;
+  color: var(--text);
+}
+
+.hero h1 .highlight {
+  background: linear-gradient(135deg, var(--accent), #F09B5C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 17px;
+  color: var(--text-body);
+  max-width: 480px;
+  margin: 0 auto 36px;
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: white;
+  padding: 16px 36px;
+  border-radius: 100px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 4px 16px rgba(232, 93, 38, 0.25);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hero-cta:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(232, 93, 38, 0.3);
+}
+
+.hero-cta .arrow { transition: transform 0.2s; }
+.hero-cta:hover .arrow { transform: translateX(3px); }
+
+.hero-note {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.hero-note strong { color: var(--text-body); font-weight: 600; }
+
+/* ── PROOF BAR ── */
+.proof-bar {
+  padding: 48px 0;
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--bg-warm);
+}
+
+.proof-bar .container {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.proof-item { text-align: center; }
+
+.proof-item .value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.proof-item .label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* ── EMAIL PREVIEW ── */
+.preview {
+  padding: 80px 0;
+}
+
+.section-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 12px;
+}
+
+.preview .section-tag, .preview h2 { text-align: center; }
+
+.preview h2 {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+
+.preview .section-sub {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 16px;
+  margin-bottom: 48px;
+  max-width: 440px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.email-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  max-width: 640px;
+  margin: 0 auto;
+  box-shadow: var(--shadow-lg);
+}
+
+.email-chrome {
+  padding: 14px 18px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.chrome-dot { width: 11px; height: 11px; border-radius: 50%; }
+.chrome-dot:nth-child(1) { background: #FF6058; }
+.chrome-dot:nth-child(2) { background: #FFBD2E; }
+.chrome-dot:nth-child(3) { background: #27CA40; }
+
+.email-meta {
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.email-from {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.email-subj {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.email-content { padding: 22px; }
+
+.metrics-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.mini-metric {
+  background: var(--surface);
+  border-radius: var(--radius-sm);
+  padding: 12px 10px;
+  text-align: center;
+}
+
+.mini-metric .mm-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.mini-metric .mm-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-top: 2px;
+}
+
+.mini-metric .mm-delta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  margin-top: 1px;
+}
+
+.mm-delta.up { color: var(--green); }
+.mm-delta.down { color: var(--red); }
+
+.campaign-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+
+.campaign-table th {
+  text-align: left;
+  padding: 8px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid var(--border-light);
+  font-weight: 600;
+}
+
+.campaign-table td {
+  padding: 10px 8px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-body);
+  font-size: 12px;
+}
+
+.campaign-table td:not(:first-child) {
+  text-align: right;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+.roas-good { color: var(--green); font-weight: 600; }
+.roas-ok { color: var(--amber); font-weight: 600; }
+.roas-bad { color: var(--red); font-weight: 600; }
+
+.ai-block {
+  background: var(--accent-light);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  border-left: 3px solid var(--accent);
+}
+
+.ai-block .ai-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.ai-block p {
+  font-size: 12px;
+  color: var(--text-body);
+  line-height: 1.55;
+  margin-bottom: 6px;
+}
+
+.ai-block p:last-child { margin-bottom: 0; }
+.ai-block strong { color: var(--text); }
+
+/* ── FEATURES ── */
+.features {
+  padding: 80px 0;
+  background: var(--bg-warm);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.features .section-tag, .features h2 { text-align: center; }
+
+.features h2 {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 48px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.f-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.f-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.f-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 16px;
+}
+
+.f-icon.orange { background: var(--accent-light); }
+.f-icon.green { background: var(--green-light); }
+.f-icon.amber { background: var(--amber-light); }
+
+.f-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.f-card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ── HOW IT WORKS ── */
+.how {
+  padding: 80px 0;
+}
+
+.how .section-tag, .how h2 { text-align: center; }
+
+.how h2 {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 48px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.s-card { text-align: center; }
+
+.s-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-light);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.s-card h3 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: -0.2px;
+}
+
+.s-card p {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.55;
+}
+
+/* ── PRICING ── */
+.pricing {
+  padding: 80px 0;
+  background: var(--bg-warm);
+  border-top: 1px solid var(--border-light);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.pricing .section-tag, .pricing h2, .pricing .section-sub {
+  text-align: center;
+}
+
+.pricing h2 {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 12px;
+}
+
+.pricing .section-sub {
+  color: var(--text-muted);
+  font-size: 16px;
+  margin-bottom: 40px;
+}
+
+.price-card {
+  background: var(--bg-card);
+  border: 2px solid var(--accent);
+  border-radius: 20px;
+  padding: 40px 32px;
+  max-width: 420px;
+  margin: 0 auto;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(232, 93, 38, 0.08);
+  position: relative;
+}
+
+.price-badge {
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 18px;
+  border-radius: 100px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.price-amount {
+  font-size: 56px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -2px;
+  margin: 12px 0 4px;
+  line-height: 1;
+}
+
+.price-amount span {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0;
+}
+
+.price-desc {
+  font-size: 15px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+
+.price-features {
+  list-style: none;
+  text-align: left;
+  margin-bottom: 32px;
+}
+
+.price-features li {
+  padding: 9px 0;
+  font-size: 15px;
+  color: var(--text-body);
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.4;
+}
+
+.check {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  background: var(--green-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 700;
+  margin-top: 1px;
+}
+
+.price-cta {
+  display: block;
+  background: var(--accent);
+  color: white;
+  padding: 16px;
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+  box-shadow: 0 4px 16px rgba(232, 93, 38, 0.25);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.price-cta:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(232, 93, 38, 0.3);
+}
+
+.price-note {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-top: 14px;
+}
+
+/* ── FAQ ── */
+.faq {
+  padding: 80px 0;
+}
+
+.faq .section-tag, .faq h2 { text-align: center; }
+
+.faq h2 {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 40px;
+}
+
+.faq-list {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--border-light);
+  padding: 20px 0;
+}
+
+.faq-item summary {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-item summary::after {
+  content: '+';
+  font-size: 22px;
+  color: var(--text-muted);
+  font-weight: 300;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.faq-item[open] summary::after { content: '\2212'; }
+
+.faq-item .faq-answer {
+  font-size: 15px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-top: 12px;
+  padding-right: 32px;
+}
+
+/* ── FINAL CTA ── */
+.final-cta {
+  padding: 80px 0;
+  text-align: center;
+  background: var(--bg-warm);
+  border-top: 1px solid var(--border-light);
+}
+
+.final-cta h2 {
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: 14px;
+  line-height: 1.1;
+}
+
+.final-cta p {
+  font-size: 17px;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding: 32px 0;
+  border-top: 1px solid var(--border-light);
+  text-align: center;
+}
+
+footer p {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+footer .footer-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+footer .footer-logo span { color: var(--accent); }
+
+/* ══════════════════════════════
+   MOBILE
+   ══════════════════════════════ */
+
+@media (max-width: 768px) {
+  .container { padding: 0 18px; }
+
+  nav { padding: 12px 0; }
+  .logo { font-size: 16px; }
+  .nav-cta { padding: 8px 16px; font-size: 13px; }
+
+  .hero { padding: 110px 0 60px; }
+  .hero-pill { font-size: 12px; padding: 5px 14px 5px 7px; }
+  .hero h1 { font-size: 32px; letter-spacing: -0.8px; }
+  .hero-sub { font-size: 15px; margin-bottom: 28px; }
+  .hero-cta { padding: 15px 32px; font-size: 15px; width: 100%; justify-content: center; max-width: 340px; }
+
+  .proof-bar { padding: 36px 0; }
+  .proof-bar .container { gap: 28px; }
+  .proof-item .value { font-size: 24px; }
+  .proof-item .label { font-size: 12px; }
+
+  .preview { padding: 60px 0; }
+
+  .metrics-strip { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .mini-metric .mm-value { font-size: 16px; }
+  .mini-metric .mm-label { font-size: 8px; }
+
+  .campaign-table th { font-size: 8px; padding: 6px 4px; }
+  .campaign-table td { font-size: 11px; padding: 8px 4px; }
+  .campaign-table td:not(:first-child) { font-size: 10px; }
+
+  .ai-block { padding: 14px; }
+  .ai-block p { font-size: 11px; }
+
+  .email-content { padding: 16px; }
+  .email-meta { padding: 14px 16px; }
+
+  .features { padding: 60px 0; }
+  .feature-grid { grid-template-columns: 1fr; gap: 12px; }
+  .f-card { padding: 22px 20px; }
+
+  .how { padding: 60px 0; }
+  .steps { grid-template-columns: 1fr; gap: 24px; max-width: 320px; }
+
+  .pricing { padding: 60px 0; }
+  .price-card { padding: 32px 24px; }
+  .price-amount { font-size: 48px; }
+
+  .faq { padding: 60px 0; }
+  .faq-item summary { font-size: 15px; }
+  .faq-item .faq-answer { font-size: 14px; padding-right: 16px; }
+
+  .final-cta { padding: 60px 0; }
+  .final-cta .hero-cta { width: 100%; max-width: 340px; justify-content: center; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .feature-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Animations ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-pill { animation: fadeUp 0.5s ease-out both; }
+.hero h1 { animation: fadeUp 0.5s ease-out 0.08s both; }
+.hero-sub { animation: fadeUp 0.5s ease-out 0.16s both; }
+.hero-cta { animation: fadeUp 0.5s ease-out 0.24s both; }
+.hero-note { animation: fadeUp 0.5s ease-out 0.3s both; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <a href="#" class="logo">ad<span>pulse</span></a>
+    <a href="#pricing" class="nav-cta">Get your first month free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-pill"><span class="dot"></span> Built for performance marketers</div>
+    <h1>Your Google Ads report.<br><span class="highlight">Every morning. Automated.</span></h1>
+    <p class="hero-sub">Campaign metrics, trend analysis, change log tracking, and AI action items — delivered to your inbox before your first coffee.</p>
+    <a href="#pricing" class="hero-cta">Get your first month free <span class="arrow">&rarr;</span></a>
+    <p class="hero-note"><strong>$29/mo</strong> after that. Cancel anytime.</p>
+  </div>
+</section>
+
+<!-- PROOF BAR -->
+<section class="proof-bar">
+  <div class="container">
+    <div class="proof-item">
+      <div class="value">60 min</div>
+      <div class="label">Saved per account, daily</div>
+    </div>
+    <div class="proof-item">
+      <div class="value">7:00 AM</div>
+      <div class="label">In your inbox every morning</div>
+    </div>
+    <div class="proof-item">
+      <div class="value">$0.00</div>
+      <div class="label">Your first month</div>
+    </div>
+  </div>
+</section>
+
+<!-- EMAIL PREVIEW -->
+<section class="preview" id="preview">
+  <div class="container">
+    <div class="section-tag">What you get</div>
+    <h2>A real report, not a dashboard you'll never check</h2>
+    <p class="section-sub">Open your email. Know exactly what happened, what changed, and what to do next.</p>
+
+    <div class="email-card">
+      <div class="email-chrome">
+        <div class="chrome-dot"></div>
+        <div class="chrome-dot"></div>
+        <div class="chrome-dot"></div>
+      </div>
+      <div class="email-meta">
+        <div class="email-from">From: AdPulse &lt;<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a9dbccd9c6dbdddae9c8cdd9dcc5dacc87dbccd9c6dbdd">[email&#160;protected]</a>&gt;</div>
+        <div class="email-subj">&#x1F4CA; Daily Report &mdash; Feb 23 | Spend: $1,847 | ROAS: 4.2x | 23 Purchases</div>
+      </div>
+      <div class="email-content">
+        <div class="metrics-strip">
+          <div class="mini-metric">
+            <div class="mm-label">Spend</div>
+            <div class="mm-value">$1,847</div>
+            <div class="mm-delta up">&uarr; 12% DoD</div>
+          </div>
+          <div class="mini-metric">
+            <div class="mm-label">Revenue</div>
+            <div class="mm-value">$7,759</div>
+            <div class="mm-delta up">&uarr; 24% DoD</div>
+          </div>
+          <div class="mini-metric">
+            <div class="mm-label">ROAS</div>
+            <div class="mm-value" style="color:var(--green);">4.2x</div>
+            <div class="mm-delta up">&uarr; 0.4x DoD</div>
+          </div>
+          <div class="mini-metric">
+            <div class="mm-label">CPA</div>
+            <div class="mm-value">$80.32</div>
+            <div class="mm-delta up">&darr; 8% DoD</div>
+          </div>
+        </div>
+
+        <table class="campaign-table">
+          <tr><th>Campaign</th><th>Spend</th><th>ROAS</th><th>Conv</th><th>CPA</th></tr>
+          <tr><td>Brand Search &mdash; Core</td><td>$312</td><td class="roas-good">8.4x</td><td>14</td><td>$22</td></tr>
+          <tr><td>NB Search &mdash; Supplements</td><td>$687</td><td class="roas-good">3.1x</td><td>6</td><td>$114</td></tr>
+          <tr><td>PMax &mdash; All Products</td><td>$548</td><td class="roas-ok">2.8x</td><td>3</td><td>$183</td></tr>
+          <tr><td>Shopping &mdash; Top SKUs</td><td>$300</td><td class="roas-bad">1.2x</td><td>0</td><td>&mdash;</td></tr>
+        </table>
+
+        <div class="ai-block">
+          <div class="ai-tag">&#x1F916; AI Action Items</div>
+          <p><strong>1. Scale NB Search &mdash; Supplements.</strong> ROAS improved from 2.4x &rarr; 3.1x after yesterday&rsquo;s bid adjustment. Increase daily budget from $600 &rarr; $800.</p>
+          <p><strong>2. Investigate Shopping &mdash; Top SKUs.</strong> Zero conversions on $300 spend. Yesterday&rsquo;s feed update changed 12 product titles &mdash; likely disrupted relevance.</p>
+          <p><strong>3. Watch PMax brand leakage.</strong> 34% of PMax clicks came from branded queries. Consider excluding brand terms.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="container">
+    <div class="section-tag">Everything in one email</div>
+    <h2>Five reports. Zero spreadsheets.</h2>
+
+    <div class="feature-grid">
+      <div class="f-card">
+        <div class="f-icon orange">&#x1F4CA;</div>
+        <h3>Campaign &amp; Ad Group Metrics</h3>
+        <p>Spend, revenue, ROAS, CPA, conversions, CTR, CPC, and impression share &mdash; for every active campaign.</p>
+      </div>
+      <div class="f-card">
+        <div class="f-icon green">&#x1F4C8;</div>
+        <h3>Day-over-Day Trends</h3>
+        <p>Yesterday vs. the day before with percentage changes. Spot problems on Day 1, not Day 5.</p>
+      </div>
+      <div class="f-card">
+        <div class="f-icon amber">&#x1F4C9;</div>
+        <h3>Week-over-Week Analysis</h3>
+        <p>Rolling 7-day comparisons that smooth out noise and reveal true performance trajectories.</p>
+      </div>
+      <div class="f-card">
+        <div class="f-icon orange">&#x1F4DD;</div>
+        <h3>Change Log Tracking</h3>
+        <p>Every bid adjustment, budget change, and keyword modification &mdash; correlated with performance shifts.</p>
+      </div>
+      <div class="f-card">
+        <div class="f-icon green">&#x1F916;</div>
+        <h3>AI Action Items</h3>
+        <p>Specific, prioritized recommendations referencing exact campaigns and metrics. Not generic advice.</p>
+      </div>
+      <div class="f-card">
+        <div class="f-icon amber">&#x23F0;</div>
+        <h3>7 AM, Every Day</h3>
+        <p>In your inbox before your first meeting. Walk into every client call already prepared.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="container">
+    <div class="section-tag">Takes 5 minutes</div>
+    <h2>Three steps. Then it&rsquo;s automatic.</h2>
+
+    <div class="steps">
+      <div class="s-card">
+        <div class="s-num">1</div>
+        <h3>Connect your account</h3>
+        <p>Fill out a quick form with your Google Ads details. We handle the technical setup.</p>
+      </div>
+      <div class="s-card">
+        <div class="s-num">2</div>
+        <h3>Set your preferences</h3>
+        <p>Delivery time, timezone, performance targets, and which campaigns to include.</p>
+      </div>
+      <div class="s-card">
+        <div class="s-num">3</div>
+        <h3>Wake up to insights</h3>
+        <p>Your first report arrives the next morning. Every day after, it just shows up.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="section-tag">Simple pricing</div>
+    <h2>Less than the cost of one manual hour</h2>
+    <p class="section-sub">Your first month is completely free. No credit card required to start.</p>
+
+    <div class="price-card">
+      <div class="price-badge">First month free</div>
+      <div class="price-amount">$29<span>/mo</span></div>
+      <p class="price-desc">per Google Ads account</p>
+
+      <ul class="price-features">
+        <li><span class="check">&#x2713;</span> Daily automated email report</li>
+        <li><span class="check">&#x2713;</span> Campaign &amp; ad group performance metrics</li>
+        <li><span class="check">&#x2713;</span> Day-over-day trend analysis</li>
+        <li><span class="check">&#x2713;</span> Week-over-week comparisons</li>
+        <li><span class="check">&#x2713;</span> Change log tracking &amp; correlation</li>
+        <li><span class="check">&#x2713;</span> AI-powered action items</li>
+        <li><span class="check">&#x2713;</span> Cancel anytime, no contracts</li>
+      </ul>
+
+      <a href="https://tally.so/r/YOUR_FORM_ID" class="price-cta" target="_blank">Get your first month free &rarr;</a>
+      <p class="price-note">No credit card required. Set up in under 5 minutes.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="container">
+    <div class="section-tag">Questions</div>
+    <h2>Everything you need to know</h2>
+
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary>Is my Google Ads data secure?</summary>
+        <p class="faq-answer">All credentials are encrypted using Google Cloud Secret Manager. We only have read access to your account &mdash; we never make changes to your campaigns or settings.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What if I manage multiple Google Ads accounts?</summary>
+        <p class="faq-answer">Each account is $29/month with its own daily report, custom targets, and delivery preferences. Just fill out the form once per account.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Can I customize what&rsquo;s in the report?</summary>
+        <p class="faq-answer">During onboarding you set your target CPA and ROAS thresholds, timezone, delivery time, and which campaigns to include or exclude. The AI analysis adapts to your specific account context.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>How does the AI analysis work?</summary>
+        <p class="faq-answer">We use Claude AI to analyze your performance data, correlate account changes with results, and generate specific action items referencing exact campaigns and ad groups. It&rsquo;s your data analyzed &mdash; not generic advice.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>What time do reports arrive?</summary>
+        <p class="faq-answer">Default is 7:00 AM in your timezone. You can customize this to any time during onboarding.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>Do you support Meta Ads too?</summary>
+        <p class="faq-answer">Not yet &mdash; but Meta Ads reports are coming soon. Sign up now and you&rsquo;ll be first to know when it launches.</p>
+      </details>
+
+      <details class="faq-item">
+        <summary>How do I cancel?</summary>
+        <p class="faq-answer">Just reply to any report email and say &ldquo;cancel.&rdquo; That&rsquo;s it. No retention calls, no hoops. Your reports stop and you&rsquo;re never charged again.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="container">
+    <h2>Stop exporting spreadsheets.<br>Start making decisions.</h2>
+    <p>Your first report arrives tomorrow morning. First month completely free.</p>
+    <a href="https://tally.so/r/YOUR_FORM_ID" class="hero-cta" target="_blank">Get your first month free <span class="arrow">&rarr;</span></a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <p style="margin-bottom: 6px;"><span class="footer-logo">ad<span>pulse</span></span> &mdash; a 
